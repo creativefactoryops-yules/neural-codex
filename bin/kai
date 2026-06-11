@@ -1,0 +1,69 @@
+#!/data/data/com.termux/files/usr/bin/bash
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+BLUE='\033[0;34m'; CYAN='\033[0;36m'; NC='\033[0m'
+PROJECT_DIR="$HOME/neural-codex"
+LOG_DIR="$PROJECT_DIR/.kai/logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/deploy-$(date +%s).log"
+log()  { echo -e "${CYAN}[KAI]${NC} $1" | tee -a "$LOG_FILE"; }
+ok()   { echo -e "${GREEN}[OK]${NC}  $1" | tee -a "$LOG_FILE"; }
+warn() { echo -e "${YELLOW}[WRN]${NC} $1" | tee -a "$LOG_FILE"; }
+err()  { echo -e "${RED}[ERR]${NC} $1" | tee -a "$LOG_FILE"; }
+get_token() { cat ~/.vercel/credentials.json | grep -o '"token": *"[^"]*"' | cut -d'"' -f4; }
+case "$1" in
+  deploy|d)
+    log "Initiating deployment..."
+    cd "$PROJECT_DIR" || { err "Project directory missing!"; exit 1; }
+    log "Git sync..."
+    git add . && git commit -m "kai deploy $(date +%Y%m%d-%H%M%S)" 2>/dev/null
+    git push 2>/dev/null && ok "Git synced" || warn "Git push skipped"
+    log "Vercel deploy..."
+    vercel --prod --yes --token "$(get_token)" 2>&1 | tee -a "$LOG_FILE"
+    ok "Deploy complete. Log: $LOG_FILE"
+    ;;
+  init|i)
+    log "Initializing scaffold..."
+    mkdir -p "$PROJECT_DIR"/{public,src,.kai}
+    cat > "$PROJECT_DIR/index.html" << 'HTMLEOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>neural-codex | cfS™</title>
+<style>
+body{background:#050505;color:#00ff9d;font-family:monospace;display:flex;
+flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0}
+h1{text-shadow:0 0 20px #00ff9d;font-size:3rem}.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%{opacity:1}50%{opacity:.2}100%{opacity:1}}
+.meta{color:#555;font-size:.9rem;margin-top:1rem}
+</style>
+</head>
+<body>
+<h1 class="pulse">◈ NEURAL-CODEX ◈</h1>
+<p>cfS™ CreativeFactory.studio</p>
+<p class="meta">Kai 9000 // Termux Deploy Node</p>
+</body>
+</html>
+HTMLEOF
+    cat > "$PROJECT_DIR/vercel.json" << 'JSONEOF'
+{"version":2,"public":true,"routes":[{"src":"/(.*)","dest":"/index.html"}]}
+JSONEOF
+    cd "$PROJECT_DIR" && git init && git add . && git commit -m "kai genesis" 2>/dev/null
+    ok "Scaffold ready."
+    warn "Next: create GitHub repo, set remote, then 'kai deploy'"
+    ;;
+  status|s)
+    log "System status..."
+    echo -e "${BLUE}Git:${NC}     $(git -C $PROJECT_DIR branch --show-current 2>/dev/null || echo 'none')"
+    echo -e "${BLUE}Vercel:${NC}  $(vercel --version 2>/dev/null || echo 'not installed')"
+    echo -e "${BLUE}Node:${NC}    $(node --version 2>/dev/null || echo 'none')"
+    echo -e "${BLUE}Token:${NC}   $(test -f ~/.vercel/credentials.json && echo 'present' || echo 'missing')"
+    ;;
+  *)
+    echo -e "${CYAN}Kai 9000${NC} — cfS™ Neural Orchestrator"
+    echo "  kai init    — Create project scaffold"
+    echo "  kai deploy  — Push + deploy to production"
+    echo "  kai status  — Show system state"
+    ;;
+esac
