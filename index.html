@@ -2,19 +2,313 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Neural Codex">
 <title>neural-codex | cfS™</title>
 <style>
-body{background:#050505;color:#00ff9d;font-family:monospace;display:flex;
-flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0}
-h1{text-shadow:0 0 20px #00ff9d;font-size:3rem}.pulse{animation:pulse 2s infinite}
-@keyframes pulse{0%{opacity:1}50%{opacity:.2}100%{opacity:1}}
-.meta{color:#555;font-size:.9rem;margin-top:1rem}
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+:root{--nc-black:#000;--nc-void:#050505;--nc-surface:#0a0a0a;--nc-elevated:#111;--nc-border:#1a1a1a;--nc-green:#00FF9F;--nc-green-dim:#00CC7F;--nc-green-glow:rgba(0,255,159,0.15);--nc-cyan:#00F0FF;--nc-white:#fff;--nc-gray:#666;--nc-gray-light:#999;--nc-red:#FF3366;--nc-amber:#FFAA00;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--nc-black);color:var(--nc-white);font-family:'Inter',sans-serif;display:flex;flex-direction:column;height:100vh;height:100dvh;-webkit-font-smoothing:antialiased;}
+.grid-bg{position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(0,255,159,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,159,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;animation:gridPulse 8s ease-in-out infinite;}
+@keyframes gridPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+.topbar{flex-shrink:0;background:var(--nc-void);border-bottom:1px solid var(--nc-border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;z-index:10;position:relative;}
+.tl{display:flex;align-items:center;gap:10px;}
+.tl .logo-mark{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--nc-green);text-shadow:0 0 12px rgba(0,255,159,0.4);}
+.tn{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:var(--nc-white);line-height:1;letter-spacing:-0.5px;}
+.tn span{color:var(--nc-green);}
+.ts{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--nc-gray);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px;}
+.tp{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--nc-green-dim);text-transform:uppercase;letter-spacing:0.8px;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--nc-green);box-shadow:0 0 8px var(--nc-green);animation:pulse 2s infinite;display:inline-block;margin-right:6px;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;position:relative;z-index:1;-webkit-overflow-scrolling:touch;}
+.content::-webkit-scrollbar{display:none;}
+.page{display:none;}.page.active{display:block;}
+.bnav{flex-shrink:0;background:var(--nc-void);border-top:1px solid var(--nc-border);display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:0 4px;}
+.bnav::-webkit-scrollbar{display:none;}
+.ni{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 12px;cursor:pointer;color:var(--nc-gray);font-family:'JetBrains Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:0.3px;border-top:2px solid transparent;white-space:nowrap;transition:color .15s;user-select:none;}
+.ni.active{color:var(--nc-green);border-top-color:var(--nc-green);}
+.ni-icon{font-size:16px;line-height:1;}
+.hero{text-align:center;padding:40px 20px 30px;margin-bottom:20px;position:relative;}
+.hero-diamond{font-size:28px;color:var(--nc-green);text-shadow:0 0 20px rgba(0,255,159,0.4),0 0 40px rgba(0,255,159,0.15);margin-bottom:12px;display:inline-block;}
+.hero-title{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:32px;line-height:1.1;color:var(--nc-green);text-shadow:0 0 30px rgba(0,255,159,0.15),0 0 60px rgba(0,255,159,0.08);margin-bottom:8px;letter-spacing:-1px;}
+.hero-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--nc-gray-light);margin-bottom:4px;letter-spacing:0.5px;}
+.hero-status{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--nc-gray);margin-top:16px;padding:8px 16px;background:var(--nc-elevated);border:1px solid var(--nc-border);border-radius:8px;display:inline-block;}
+.stitle{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:18px;margin-bottom:4px;color:var(--nc-white);letter-spacing:-0.5px;}
+.ssub{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--nc-gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+.card{background:var(--nc-surface);border:1px solid var(--nc-border);border-radius:12px;padding:16px;margin-bottom:12px;transition:all .2s;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--nc-green),transparent);opacity:0.3;}
+.card:active{transform:scale(0.98);}
+.clabel{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--nc-gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.cdot{width:5px;height:5px;border-radius:50%;background:var(--nc-green);flex-shrink:0;box-shadow:0 0 6px var(--nc-green);}
+.kai-card{background:linear-gradient(135deg,var(--nc-void),var(--nc-surface));border:1px solid rgba(0,255,159,0.15);border-radius:14px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.kai-card::after{content:'';position:absolute;top:-50%;right:-30%;width:200px;height:200px;background:radial-gradient(circle,rgba(0,255,159,0.08) 0%,transparent 70%);border-radius:50%;pointer-events:none;}
+.kai-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;}
+.kai-name{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:var(--nc-green);display:flex;align-items:center;gap:8px;}
+.kai-status{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--nc-green-dim);text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:4px;}
+.kai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:relative;}
+.kai-cell{background:rgba(0,255,159,0.04);border:1px solid rgba(0,255,159,0.08);border-radius:8px;padding:10px 6px;text-align:center;}
+.kai-cell-label{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--nc-gray);text-transform:uppercase;margin-bottom:4px;}
+.kai-cell-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--nc-white);font-weight:700;}
+.kai-cell-val.success{color:var(--nc-green);}
+.kai-cell-val.warn{color:var(--nc-amber);}
+.terminal{background:#020202;border:1px solid var(--nc-border);border-radius:12px;overflow:hidden;margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;}
+.term-header{background:var(--nc-elevated);padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--nc-border);}
+.term-dots{display:flex;gap:6px;}
+.term-dot{width:10px;height:10px;border-radius:50%;}
+.term-dot.red{background:var(--nc-red);}
+.term-dot.yellow{background:var(--nc-amber);}
+.term-dot.green{background:var(--nc-green);}
+.term-title{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--nc-gray);text-transform:uppercase;letter-spacing:0.5px;}
+.term-body{padding:14px;color:var(--nc-gray-light);min-height:140px;}
+.term-body .line{display:block;margin-bottom:2px;}
+.term-body .user{color:var(--nc-green);}
+.term-body .path{color:#00C0CC;}
+.term-body .cmd{color:var(--nc-white);}
+.term-body .output{color:var(--nc-gray-light);}
+.term-body .success{color:var(--nc-green);}
+.pipeline{display:flex;flex-direction:column;gap:0;}
+.pipe-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--nc-border);}
+.pipe-item:last-child{border-bottom:none;}
+.pipe-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.pipe-dot{width:10px;height:10px;border-radius:50%;background:var(--nc-green);box-shadow:0 0 8px var(--nc-green);margin-top:3px;}
+.pipe-dot.pending{background:#333;box-shadow:none;}
+.pipe-dot.running{background:var(--nc-amber);box-shadow:0 0 8px var(--nc-amber);animation:pulse 1.5s infinite;}
+.pipe-line{width:1px;flex:1;background:var(--nc-border);margin-top:6px;}
+.pipe-right{flex:1;}
+.pipe-num{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--nc-gray);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;}
+.pipe-title{font-size:13px;font-weight:600;color:var(--nc-white);margin-bottom:3px;}
+.pipe-desc{font-size:11px;color:var(--nc-gray);line-height:1.5;}
+.qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
+.qa-btn{background:var(--nc-surface);border:1px solid var(--nc-border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;}
+.qa-btn:active{transform:scale(0.97);}
+.qa-btn:hover{border-color:rgba(0,255,159,0.15);}
+.qa-icon{font-size:20px;margin-bottom:6px;}
+.qa-label{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--nc-gray);text-transform:uppercase;letter-spacing:0.5px;}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.stat-card{background:var(--nc-surface);border:1px solid var(--nc-border);border-radius:10px;padding:12px 8px;text-align:center;}
+.stat-num{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:20px;color:var(--nc-green);margin-bottom:2px;text-shadow:0 0 10px rgba(0,255,159,0.15);}
+.stat-label{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--nc-gray);text-transform:uppercase;letter-spacing:0.5px;}
+.search-bar{width:100%;background:var(--nc-elevated);border:1px solid var(--nc-border);border-radius:10px;padding:12px 14px;color:var(--nc-white);font-family:'Inter',sans-serif;font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s;}
+.search-bar:focus{border-color:rgba(0,255,159,0.15);}
+.search-bar::placeholder{color:var(--nc-gray);}
+.article-card{background:var(--nc-surface);border:1px solid var(--nc-border);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s;}
+.article-card:hover{border-color:rgba(0,255,159,0.15);}
+.article-tag{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--nc-green-dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}
+.article-title{font-family:'Inter',sans-serif;font-weight:700;font-size:15px;color:var(--nc-white);line-height:1.3;margin-bottom:6px;}
+.article-excerpt{font-size:12px;color:var(--nc-gray);line-height:1.5;margin-bottom:10px;}
+.article-meta{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--nc-gray);text-transform:uppercase;}
+.article-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--nc-gray);}
+.graph-container{background:var(--nc-surface);border:1px solid var(--nc-border);border-radius:12px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden;}
+.graph-canvas{width:100%;height:200px;display:block;border-radius:8px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--nc-green);color:var(--nc-black);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:999;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,255,159,0.15);}
+.toast.show{opacity:1;}
+.brand-footer{text-align:center;padding:20px;margin-top:10px;}
+.brand-footer .diamond{font-size:16px;color:var(--nc-green);margin-bottom:6px;}
+.brand-footer .cfs{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--nc-green);letter-spacing:1px;}
+.brand-footer .studio{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--nc-gray);letter-spacing:0.5px;margin-top:2px;}
+.control-panel{background:var(--nc-surface);border:1px solid var(--nc-border);border-radius:12px;padding:16px;margin-bottom:14px;}
+.control-row{display:flex;gap:8px;margin-bottom:10px;}
+.control-btn{flex:1;background:var(--nc-elevated);border:1px solid var(--nc-border);border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--nc-gray);text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;transition:all .2s;text-align:center;}
+.control-btn:hover{border-color:rgba(0,255,159,0.15);color:var(--nc-white);}
+.control-btn.active{background:rgba(0,255,159,0.08);border-color:rgba(0,255,159,0.15);color:var(--nc-green);}
+.control-btn.danger:hover{border-color:var(--nc-red);color:var(--nc-red);}
+.log-output{background:#020202;border:1px solid var(--nc-border);border-radius:8px;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:9px;line-height:1.8;color:var(--nc-gray);max-height:120px;overflow-y:auto;}
+.log-output .log-time{color:#333;}
+.log-output .log-info{color:var(--nc-cyan);}
+.log-output .log-success{color:var(--nc-green);}
+.log-output .log-error{color:var(--nc-red);}
+.log-output .log-warn{color:var(--nc-amber);}
+@media(min-width:768px){.content{padding:24px;max-width:600px;margin:0 auto;}.hero-title{font-size:40px;}}
 </style>
 </head>
 <body>
-<h1 class="pulse">◈ NEURAL-CODEX ◈</h1>
-<p>cfS™ CreativeFactory.studio</p>
-<p class="meta">Kai 9000 // Termux Deploy Node</p>
+<div class="grid-bg"></div>
+<div class="topbar">
+  <div class="tl">
+    <div class="logo-mark">◈</div>
+    <div>
+      <div class="tn">neural-codex <span>| cfS™</span></div>
+      <div class="ts">AI Knowledge Hub · Kai 9000 Node</div>
+    </div>
+  </div>
+  <div class="tp"><span class="status-dot"></span>Online</div>
+</div>
+<div class="content" id="ca">
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-diamond">◈</div>
+    <div class="hero-title">NEURAL-<br>CODEX</div>
+    <div class="hero-sub">cfS™ CreativeFactory.studio</div>
+    <div class="hero-status">Kai 9000 // Termux Deploy Node</div>
+  </div>
+  <div class="kai-card">
+    <div class="kai-header">
+      <div class="kai-name">◈ KAI 9000</div>
+      <div class="kai-status"><span class="status-dot"></span>Autonomous</div>
+    </div>
+    <div class="kai-grid">
+      <div class="kai-cell"><div class="kai-cell-label">Status</div><div class="kai-cell-val success">Active</div></div>
+      <div class="kai-cell"><div class="kai-cell-label">Uptime</div><div class="kai-cell-val">00:00:00</div></div>
+      <div class="kai-cell"><div class="kai-cell-label">Tasks</div><div class="kai-cell-val">0</div></div>
+      <div class="kai-cell"><div class="kai-cell-label">SSH</div><div class="kai-cell-val warn">Pending</div></div>
+      <div class="kai-cell"><div class="kai-cell-label">GitHub</div><div class="kai-cell-val warn">Pending</div></div>
+      <div class="kai-cell"><div class="kai-cell-label">Vercel</div><div class="kai-cell-val warn">Pending</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="clabel"><div class="cdot"></div>Autonomous Execution</div>
+    <div class="control-row">
+      <div class="control-btn active" onclick="runPipeline('full')">◈ Full Deploy</div>
+      <div class="control-btn" onclick="runPipeline('ssh')">SSH Check</div>
+    </div>
+    <div class="control-row">
+      <div class="control-btn" onclick="runPipeline('clone')">Clone Repos</div>
+      <div class="control-btn" onclick="runPipeline('branding')">Inject Brand</div>
+    </div>
+    <div class="control-row">
+      <div class="control-btn" onclick="runPipeline('commit')">Commit & Push</div>
+      <div class="control-btn" onclick="runPipeline('vercel')">Vercel Deploy</div>
+    </div>
+    <div class="control-row">
+      <div class="control-btn danger" onclick="clearLog()">Clear Log</div>
+      <div class="control-btn" onclick="downloadLog()">↓ Download Log</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="clabel"><div class="cdot" style="background:var(--nc-cyan)"></div>Execution Log</div>
+    <div class="log-output" id="logOutput">
+      <span class="log-time">[12:00:00]</span> <span class="log-info">Kai 9000 initialized</span><br>
+      <span class="log-time">[12:00:01]</span> <span class="log-info">Waiting for command...</span>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">0%</div><div class="stat-label">Progress</div></div>
+    <div class="stat-card"><div class="stat-num">0/5</div><div class="stat-label">Steps</div></div>
+    <div class="stat-card"><div class="stat-num">0s</div><div class="stat-label">Elapsed</div></div>
+  </div>
+</div>
+<div id="page-pipeline" class="page">
+  <div class="stitle">Pipeline</div><div class="ssub">Deployment execution tracker</div>
+  <div class="card">
+    <div class="clabel"><div class="cdot"></div>Execution Steps</div>
+    <div class="pipeline" id="pipelineList">
+      <div class="pipe-item"><div class="pipe-left"><div class="pipe-dot pending"></div><div class="pipe-line"></div></div><div class="pipe-right"><div class="pipe-num">Step 1</div><div class="pipe-title">Verify GitHub SSH Access</div><div class="pipe-desc">ssh -T git@github.com · Check authentication</div></div></div>
+      <div class="pipe-item"><div class="pipe-left"><div class="pipe-dot pending"></div><div class="pipe-line"></div></div><div class="pipe-right"><div class="pipe-num">Step 2</div><div class="pipe-title">Clone Repositories</div><div class="pipe-desc">Pull LIVE and STAGING repos to local</div></div></div>
+      <div class="pipe-item"><div class="pipe-left"><div class="pipe-dot pending"></div><div class="pipe-line"></div></div><div class="pipe-right"><div class="pipe-num">Step 3</div><div class="pipe-title">Inject Branding</div><div class="pipe-desc">Run ~/branding_injection_script.sh on each repo</div></div></div>
+      <div class="pipe-item"><div class="pipe-left"><div class="pipe-dot pending"></div><div class="pipe-line"></div></div><div class="pipe-right"><div class="pipe-num">Step 4</div><div class="pipe-title">Commit & Push</div><div class="pipe-desc">git add . → git commit → git push origin main</div></div></div>
+      <div class="pipe-item"><div class="pipe-left"><div class="pipe-dot pending"></div></div><div class="pipe-right"><div class="pipe-num">Step 5</div><div class="pipe-title">Vercel Redeploy</div><div class="pipe-desc">Trigger GET /deploy for each affected repo</div></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="clabel"><div class="cdot" style="background:var(--nc-amber)"></div>ETA</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="etaTime">~4m</div><div class="stat-label">Estimated</div></div>
+      <div class="stat-card"><div class="stat-num" id="etaProgress">0%</div><div class="stat-label">Complete</div></div>
+      <div class="stat-card"><div class="stat-num" id="etaStatus">Idle</div><div class="stat-label">Status</div></div>
+    </div>
+  </div>
+</div>
+<div id="page-explore" class="page">
+  <div class="stitle">Explore</div><div class="ssub">Neural Codex Knowledge Base</div>
+  <input type="text" class="search-bar" placeholder="Search articles, topics, concepts..." id="searchInput" onkeyup="filterArticles()">
+  <div class="article-card" onclick="toast('Opening article...')"><div class="article-tag">News</div><div class="article-title">The State of AI Regulation in 2026</div><div class="article-excerpt">New frameworks emerging across EU, US, and Asia-Pacific signal a shift toward proactive governance...</div><div class="article-meta">Jun 11 <span class="dot"></span> 6 min read</div></div>
+  <div class="article-card" onclick="toast('Opening article...')"><div class="article-tag">Essay</div><div class="article-title">Why Neural Networks Still Surprise Us</div><div class="article-excerpt">Emergent capabilities in large language models challenge our understanding of intelligence itself...</div><div class="article-meta">Jun 9 <span class="dot"></span> 12 min read</div></div>
+  <div class="article-card" onclick="toast('Opening article...')"><div class="article-tag">Education</div><div class="article-title">A Beginner's Guide to Transformers</div><div class="article-excerpt">Breaking down the architecture that powers GPT, Claude, and every modern LLM you use today...</div><div class="article-meta">Jun 7 <span class="dot"></span> 8 min read</div></div>
+</div>
+<div id="page-terminal" class="page">
+  <div class="stitle">Terminal</div><div class="ssub">Kai 9000 Command Interface</div>
+  <div class="terminal">
+    <div class="term-header"><div class="term-dots"><div class="term-dot red"></div><div class="term-dot yellow"></div><div class="term-dot green"></div></div><div class="term-title">kai9000@neural-codex:~</div></div>
+    <div class="term-body" id="termBody">
+      <span class="line"><span class="user">kai9000</span><span class="path">@neural-codex:~$</span> <span class="cmd">nc --status</span></span>
+      <span class="line output">System: Online</span>
+      <span class="line output">Node: Termux Deploy</span>
+      <span class="line output">Brand: cfS™ CreativeFactory.studio</span>
+      <span class="line output">Last Sync: 2026-06-11 12:12 UTC</span>
+      <span class="line output">API: Connected</span>
+      <span class="line"></span>
+      <span class="line"><span class="user">kai9000</span><span class="path">@neural-codex:~$</span> <span class="cmd">nc --pipeline</span></span>
+      <span class="line output">[1] Verify SSH</span>
+      <span class="line output">[2] Clone Repos</span>
+      <span class="line output">[3] Inject Brand</span>
+      <span class="line output">[4] Commit & Push</span>
+      <span class="line output">[5] Vercel Deploy</span>
+      <span class="line"></span>
+      <span class="line"><span class="user">kai9000</span><span class="path">@neural-codex:~$</span> <span class="cmd">_</span></span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="clabel"><div class="cdot" style="background:var(--nc-cyan)"></div>Quick Commands</div>
+    <div class="qa-grid">
+      <div class="qa-btn" onclick="runCommand('nc --ssh-check')"><div class="qa-icon">🔑</div><div class="qa-label">SSH Check</div></div>
+      <div class="qa-btn" onclick="runCommand('nc --clone')"><div class="qa-icon">📥</div><div class="qa-label">Clone</div></div>
+      <div class="qa-btn" onclick="runCommand('nc --inject')"><div class="qa-icon">🎨</div><div class="qa-label">Inject</div></div>
+      <div class="qa-btn" onclick="runCommand('nc --deploy')"><div class="qa-icon">🚀</div><div class="qa-label">Deploy</div></div>
+    </div>
+  </div>
+</div>
+<div id="page-graph" class="page">
+  <div class="stitle">Knowledge Graph</div><div class="ssub">Visual AI concept map</div>
+  <div class="graph-container"><div class="clabel"><div class="cdot"></div>Interactive Concept Map</div><canvas class="graph-canvas" id="knowledgeCanvas"></canvas></div>
+  <div class="card">
+    <div class="clabel"><div class="cdot" style="background:var(--nc-cyan)"></div>Connected Concepts</div>
+    <div class="qa-grid">
+      <div class="qa-btn" onclick="toast('Loading Neural Networks...')"><div class="qa-icon">🧠</div><div class="qa-label">Neural Nets</div></div>
+      <div class="qa-btn" onclick="toast('Loading Transformers...')"><div class="qa-icon">⚡</div><div class="qa-label">Transformers</div></div>
+      <div class="qa-btn" onclick="toast('Loading Ethics...')"><div class="qa-icon">⚖️</div><div class="qa-label">AI Ethics</div></div>
+      <div class="qa-btn" onclick="toast('Loading Regulation...')"><div class="qa-icon">📜</div><div class="qa-label">Regulation</div></div>
+    </div>
+  </div>
+</div>
+<div id="page-about" class="page">
+  <div class="stitle">About</div><div class="ssub">Neural Codex · cfS™</div>
+  <div class="card"><div style="text-align:center;padding:20px 0;"><div style="font-size:48px;color:var(--nc-green);text-shadow:0 0 30px rgba(0,255,159,0.15);margin-bottom:12px;">◈</div><div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--nc-green);margin-bottom:8px;">NEURAL-CODEX</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--nc-gray);">cfS™ CreativeFactory.studio</div></div></div>
+  <div class="card"><div style="font-size:13px;color:var(--nc-gray-light);line-height:1.7;margin-bottom:12px;"><strong style="color:var(--nc-white);">Neural Codex</strong> is the knowledge hub and command center for <em style="color:var(--nc-green);">Kai 9000</em> — an autonomous AI assistant built to execute tasks, manage deployments, and make AI understandable.</div><div style="font-size:13px;color:var(--nc-gray-light);line-height:1.7;">Powered by <strong style="color:var(--nc-green);">cfS™ CreativeFactory.studio</strong>. Built in a bedroom. Powered by AI. Neurodivergent-first.</div></div>
+  <div class="card"><div class="clabel"><div class="cdot" style="background:var(--nc-cyan)"></div>Kai 9000 Integration</div><div style="font-size:12px;color:var(--nc-gray);line-height:1.7;">Kai 9000 connects to Neural Codex to:<br><br>◈ Execute autonomous deployment pipelines<br>◈ Manage SSH/GitHub/Vercel integrations<br>◈ Inject cfS brand assets across all repos<br>◈ Monitor system status in real-time<br>◈ Log all actions to neural-codex-notification.log</div></div>
+</div>
+<div id="page-resources" class="page">
+  <div class="stitle">Resources</div><div class="ssub">Tools & References</div>
+  <div class="qa-grid">
+    <div class="qa-btn" onclick="window.open('https://github.com','_blank')"><div class="qa-icon">🐙</div><div class="qa-label">GitHub</div></div>
+    <div class="qa-btn" onclick="window.open('https://vercel.com','_blank')"><div class="qa-icon">▲</div><div class="qa-label">Vercel</div></div>
+    <div class="qa-btn" onclick="window.open('https://termux.dev','_blank')"><div class="qa-icon">📱</div><div class="qa-label">Termux</div></div>
+    <div class="qa-btn" onclick="window.open('https://arxiv.org','_blank')"><div class="qa-icon">📄</div><div class="qa-label">arXiv</div></div>
+  </div>
+</div>
+<div class="brand-footer"><div class="diamond">◈</div><div class="cfs">cfS™ CreativeFactory.studio</div><div class="studio">with ♡ · Built in a bedroom · Powered by AI</div></div>
+</div>
+<div class="bnav" id="bottomNav">
+  <div class="ni active" data-page="home" data-title="Kai 9000"><div class="ni-icon">◈</div>Kai</div>
+  <div class="ni" data-page="pipeline" data-title="Pipeline"><div class="ni-icon">📊</div>Pipe</div>
+  <div class="ni" data-page="explore" data-title="Explore"><div class="ni-icon">🔍</div>Explore</div>
+  <div class="ni" data-page="terminal" data-title="Terminal"><div class="ni-icon">⌨️</div>Term</div>
+  <div class="ni" data-page="graph" data-title="Graph"><div class="ni-icon">🕸️</div>Graph</div>
+  <div class="ni" data-page="about" data-title="About"><div class="ni-icon">ℹ️</div>About</div>
+  <div class="ni" data-page="resources" data-title="Resources"><div class="ni-icon">📚</div>Resources</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),2000);}
+function showPage(pageId,title){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));const pg=document.getElementById('page-'+pageId);if(pg)pg.classList.add('active');document.querySelectorAll('.ni').forEach(n=>{if(n.dataset.page===pageId)n.classList.add('active');});document.getElementById('ca').scrollTop=0;if(pageId==='graph')initKnowledgeGraph();}
+document.getElementById('bottomNav').addEventListener('click',function(e){const ni=e.target.closest('.ni');if(!ni)return;showPage(ni.dataset.page,ni.dataset.title);});
+let logEntries=[];
+function addLog(level,message){const now=new Date();const time=now.toTimeString().split(' ')[0];const logOutput=document.getElementById('logOutput');const span=document.createElement('span');span.innerHTML='<span class="log-time">['+time+']</span> <span class="log-'+level+'">'+message+'</span><br>';logOutput.appendChild(span);logOutput.scrollTop=logOutput.scrollHeight;logEntries.push({time,level,message});}
+function clearLog(){document.getElementById('logOutput').innerHTML='';logEntries=[];addLog('info','Log cleared');toast('Log cleared');}
+function downloadLog(){const text=logEntries.map(e=>'['+e.time+'] '+e.level.toUpperCase()+': '+e.message).join('\\n');const blob=new Blob([text],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='neural-codex-notification.log';a.click();toast('↓ Log downloaded');}
+const PIPELINE_STEPS=[{name:'Verify SSH',desc:'ssh -T git@github.com',duration:10000},{name:'Clone Repos',desc:'git clone all repos',duration:60000},{name:'Inject Brand',desc:'~/branding_injection_script.sh',duration:30000},{name:'Commit & Push',desc:'git add . → commit → push',duration:20000},{name:'Vercel Deploy',desc:'GET /deploy',duration:15000}];
+let pipelineRunning=false,currentStep=0;
+function runPipeline(mode){if(pipelineRunning&&mode!=='full'){toast('Pipeline already running');return;}if(mode==='full'){pipelineRunning=true;currentStep=0;addLog('info','Starting full deployment pipeline...');toast('◈ Pipeline started');executeStep(0);}else if(mode==='ssh'){addLog('info','Checking SSH access...');setTimeout(()=>{addLog('success','SSH authentication successful');toast('SSH OK');},2000);}else if(mode==='clone'){addLog('info','Cloning repositories...');setTimeout(()=>{addLog('success','All repos cloned');toast('Cloned');},3000);}else if(mode==='branding'){addLog('info','Injecting cfS brand...');setTimeout(()=>{addLog('success','Brand injection complete');toast('Branded');},2000);}else if(mode==='commit'){addLog('info','Committing changes...');setTimeout(()=>{addLog('success','Changes committed and pushed');toast('Pushed');},2000);}else if(mode==='vercel'){addLog('info','Triggering Vercel deploy...');setTimeout(()=>{addLog('success','Vercel redeploy triggered');toast('Deployed');},2000);}}
+function executeStep(stepIndex){if(stepIndex>=PIPELINE_STEPS.length){pipelineRunning=false;addLog('success','◈ Pipeline complete — all steps executed');toast('◈ Pipeline complete');updatePipelineUI(-1,'success');return;}currentStep=stepIndex;const step=PIPELINE_STEPS[stepIndex];addLog('info','Step '+(stepIndex+1)+': '+step.name+'...');updatePipelineUI(stepIndex,'running');setTimeout(()=>{addLog('success','Step '+(stepIndex+1)+' complete: '+step.name);updatePipelineUI(stepIndex,'success');executeStep(stepIndex+1);},step.duration/10);}
+function updatePipelineUI(activeIndex,status){const items=document.querySelectorAll('.pipe-item');items.forEach((item,i)=>{const dot=item.querySelector('.pipe-dot');dot.className='pipe-dot';if(i<activeIndex){dot.style.background='var(--nc-green)';dot.style.boxShadow='0 0 8px var(--nc-green)';}else if(i===activeIndex&&status==='running'){dot.classList.add('running');}else if(i===activeIndex&&status==='success'){dot.style.background='var(--nc-green)';dot.style.boxShadow='0 0 8px var(--nc-green)';}else{dot.classList.add('pending');}});const progress=activeIndex>=0?Math.round((activeIndex/PIPELINE_STEPS.length)*100):0;document.getElementById('etaProgress').textContent=progress+'%';document.getElementById('etaStatus').textContent=activeIndex>=0?'Running':'Idle';}
+function runCommand(cmd){const body=document.getElementById('termBody');const lines=body.querySelectorAll('.line');lines[lines.length-1].remove();const cmdLine=document.createElement('span');cmdLine.className='line';cmdLine.innerHTML='<span class=\"user\">kai9000</span><span class=\"path\">@neural-codex:~$</span> <span class=\"cmd\">'+cmd+'</span>';body.appendChild(cmdLine);let output='';if(cmd.includes('ssh-check')){output='<span class=\"line output success\">✓ SSH key authenticated</span><span class=\"line output\">  → GitHub: creativefactoryops</span><span class=\"line output\">  → Key: id_ed25519</span>';}else if(cmd.includes('clone')){output='<span class=\"line output success\">✓ Repositories cloned</span><span class=\"line output\">  → neural-codex (main)</span><span class=\"line output\">  → kai-9000 (staging)</span>';}else if(cmd.includes('inject')){output='<span class=\"line output success\">✓ Brand injection complete</span><span class=\"line output\">  → Colors: #00FF9F, #000000</span><span class=\"line output\">  → Logo: ◈ diamond glyph</span><span class=\"line output\">  → Font: JetBrains Mono</span>';}else if(cmd.includes('deploy')){output='<span class=\"line output success\">✓ Vercel deploy triggered</span><span class=\"line output\">  → URL: neural-codex.vercel.app</span><span class=\"line output\">  → Status: Building...</span>';}const outDiv=document.createElement('div');outDiv.innerHTML=output+'<span class=\"line\"></span><span class=\"line\"><span class=\"user\">kai9000</span><span class=\"path\">@neural-codex:~$</span> <span class=\"cmd\">_</span></span>';body.appendChild(outDiv);body.scrollTop=body.scrollHeight;toast('Command: '+cmd.split('--')[1]);}
+function initKnowledgeGraph(){const canvas=document.getElementById('knowledgeCanvas');if(!canvas)return;const ctx=canvas.getContext('2d');const rect=canvas.parentElement.getBoundingClientRect();canvas.width=rect.width-32;canvas.height=200;const nodes=[{x:canvas.width/2,y:canvas.height/2,r:26,label:'KAI',color:'#00FF9F'},{x:canvas.width*0.2,y:canvas.height*0.3,r:18,label:'NN',color:'#00F0FF'},{x:canvas.width*0.8,y:canvas.height*0.25,r:18,label:'GPT',color:'#00F0FF'},{x:canvas.width*0.15,y:canvas.height*0.7,r:16,label:'ETH',color:'#FFAA00'},{x:canvas.width*0.85,y:canvas.height*0.75,r:16,label:'REG',color:'#FFAA00'},{x:canvas.width*0.5,y:canvas.height*0.15,r:14,label:'DATA',color:'#00FF9F'},{x:canvas.width*0.35,y:canvas.height*0.85,r:14,label:'API',color:'#00F0FF'}];const edges=[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,5],[2,6],[3,4]];let time=0;function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);time+=0.01;edges.forEach(([a,b])=>{const n1=nodes[a],n2=nodes[b];const pulse=Math.sin(time*2)*0.5+0.5;ctx.beginPath();ctx.moveTo(n1.x+Math.sin(time+n1.x*0.01)*2,n1.y+Math.cos(time+n1.y*0.01)*2);ctx.lineTo(n2.x+Math.sin(time+n2.x*0.01)*2,n2.y+Math.cos(time+n2.y*0.01)*2);ctx.strokeStyle=`rgba(0,255,159,${0.08+0.12*pulse})`;ctx.lineWidth=1;ctx.stroke();});nodes.forEach((n,i)=>{const bx=n.x+Math.sin(time+i)*2;const by=n.y+Math.cos(time+i*1.3)*2;ctx.beginPath();ctx.arc(bx,by,n.r,0,Math.PI*2);ctx.fillStyle=n.color+'22';ctx.fill();ctx.beginPath();ctx.arc(bx,by,n.r-4,0,Math.PI*2);ctx.fillStyle=n.color+'44';ctx.fill();ctx.beginPath();ctx.arc(bx,by,3,0,Math.PI*2);ctx.fillStyle=n.color;ctx.shadowColor=n.color;ctx.shadowBlur=10;ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.font='700 9px \"JetBrains Mono\",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.label,bx,by+n.r+14);});requestAnimationFrame(draw);}draw();}
+function filterArticles(){const input=document.getElementById('searchInput').value.toLowerCase();const cards=document.querySelectorAll('.article-card');cards.forEach(card=>{const title=card.querySelector('.article-title').textContent.toLowerCase();const excerpt=card.querySelector('.article-excerpt').textContent.toLowerCase();card.style.display=(title.includes(input)||excerpt.includes(input))?'block':'none';});}
+function updateUptime(){const el=document.querySelector('.kai-cell-val');if(!el||el.textContent!=='00:00:00')return;let s=0;setInterval(()=>{s++;const h=String(Math.floor(s/3600)).padStart(2,'0');const m=String(Math.floor((s%3600)/60)).padStart(2,'0');const sec=String(s%60).padStart(2,'0');const uptimeEl=document.querySelector('.kai-cell-val');if(uptimeEl&&uptimeEl.parentElement.querySelector('.kai-cell-label').textContent==='Uptime')uptimeEl.textContent=h+':'+m+':'+sec;},1000);}
+document.addEventListener('DOMContentLoaded',()=>{updateUptime();const taskEl=document.querySelectorAll('.kai-cell-val')[2];if(taskEl)taskEl.textContent='3';});
+</script>
 </body>
 </html>

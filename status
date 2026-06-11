@@ -1,0 +1,12 @@
+#!/data/data/com.termux/files/usr/bin/bash
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+AMBER='\033[0;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+echo -e "${GREEN}◈ NEURAL-CODEX STATUS${NC}"
+echo -e "  ${CYAN}Server:${NC} $(pgrep -f 'http.server 8080' > /dev/null && echo -e "${GREEN}● Running${NC} on :8080" || echo -e "${RED}● Stopped${NC}")"
+echo -e "  ${CYAN}File:${NC}   $(test -f index.html && echo -e "${GREEN}● OK${NC} ($(wc -c < index.html) bytes)" || echo -e "${RED}● Missing${NC}")"
+echo -e "  ${CYAN}Node:${NC}   ${AMBER}Kai 9000 // Termux${NC}"
+echo -e "  ${CYAN}Brand:${NC}  cfS™ CreativeFactory.studio"
