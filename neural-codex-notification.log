@@ -1,0 +1,5 @@
+[20:12:11] INFO: Starting HTTP server on port 8080...
+[20:12:11] OK: Server online · PID 18738 · http://localhost:8080
+[20:12:13] OK: Opened browser · localhost:8080
+[20:33:52] OK: Server already running on :8080
+[20:33:53] OK: Opened browser · localhost:8080

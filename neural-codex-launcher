@@ -1,0 +1,148 @@
+#!/data/data/com.termux/files/usr/bin/bash
+NC_GREEN='\033[0;32m'
+NC_CYAN='\033[0;36m'
+NC_AMBER='\033[0;33m'
+NC_RED='\033[0;31m'
+NC_DIM='\033[0;90m'
+NC_RESET='\033[0m'
+NC_BOLD='\033[1m'
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_FILE="$SCRIPT_DIR/neural-codex-notification.log"
+PID_FILE="$SCRIPT_DIR/.server.pid"
+PORT=8080
+
+log() {
+    local level="$1"
+    local msg="$2"
+    local color="$NC_DIM"
+    case "$level" in
+        INFO)  color="$NC_CYAN" ;;
+        OK)    color="$NC_GREEN" ;;
+        WARN)  color="$NC_AMBER" ;;
+        ERROR) color="$NC_RED" ;;
+    esac
+    local timestamp=$(date '+%H:%M:%S')
+    echo -e "${color}[${timestamp}]${NC_RESET} ${msg}"
+    echo "[${timestamp}] ${level}: ${msg}" >> "$LOG_FILE" 2>/dev/null
+}
+
+show_banner() {
+    clear
+    echo -e "${NC_GREEN}╔══════════════════════════════════════════╗${NC_RESET}"
+    echo -e "${NC_GREEN}║${NC_RESET}  ${NC_BOLD}◈ NEURAL-CODEX${NC_RESET}                        ${NC_GREEN}║${NC_RESET}"
+    echo -e "${NC_GREEN}║${NC_RESET}  ${NC_DIM}cfS™ CreativeFactory.studio${NC_RESET}          ${NC_GREEN}║${NC_RESET}"
+    echo -e "${NC_GREEN}║${NC_RESET}  ${NC_DIM}YULEFORGE · Termux Deploy Node${NC_RESET}        ${NC_GREEN}║${NC_RESET}"
+    echo -e "${NC_GREEN}╚══════════════════════════════════════════╝${NC_RESET}"
+    echo
+}
+
+check_server() {
+    if [ -f "$PID_FILE" ]; then
+        local pid=$(cat "$PID_FILE" 2>/dev/null)
+        if kill -0 "$pid" 2>/dev/null; then
+            return 0
+        fi
+    fi
+    if command -v netstat >/dev/null 2>&1 && netstat -tlnp 2>/dev/null | grep -q ":$PORT "; then
+        return 0
+    fi
+    if command -v ss >/dev/null 2>&1 && ss -tlnp 2>/dev/null | grep -q ":$PORT "; then
+        return 0
+    fi
+    return 1
+}
+
+start_server() {
+    if check_server; then
+        log OK "Server already running on :$PORT"
+        return 0
+    fi
+    log INFO "Starting HTTP server on port $PORT..."
+    cd "$SCRIPT_DIR"
+    nohup python3 -m http.server $PORT > /dev/null 2>&1 &
+    local pid=$!
+    echo $pid > "$PID_FILE"
+    local tries=0
+    while [ $tries -lt 10 ]; do
+        sleep 0.3
+        if kill -0 $pid 2>/dev/null; then
+            log OK "Server online · PID $pid · http://localhost:$PORT"
+            return 0
+        fi
+        tries=$((tries + 1))
+    done
+    log ERROR "Server failed to start"
+    rm -f "$PID_FILE"
+    return 1
+}
+
+stop_server() {
+    if [ -f "$PID_FILE" ]; then
+        local pid=$(cat "$PID_FILE" 2>/dev/null)
+        if kill -0 "$pid" 2>/dev/null; then
+            kill "$pid" 2>/dev/null
+            log OK "Server stopped (PID $pid)"
+        fi
+        rm -f "$PID_FILE"
+    fi
+    pkill -f "http.server $PORT" 2>/dev/null
+}
+
+show_status() {
+    echo -e "${NC_BOLD}◈ SYSTEM STATUS${NC_RESET}"
+    echo
+    if check_server; then
+        local pid=$(cat "$PID_FILE" 2>/dev/null)
+        echo -e "  ${NC_GREEN}●${NC_RESET} Server     ${NC_GREEN}RUNNING${NC_RESET}  PID ${pid:-?} · :$PORT"
+    else
+        echo -e "  ${NC_RED}●${NC_RESET} Server     ${NC_RED}OFFLINE${NC_RESET}"
+    fi
+    if [ -f "$SCRIPT_DIR/index.html" ]; then
+        local size=$(wc -c < "$SCRIPT_DIR/index.html" 2>/dev/null)
+        echo -e "  ${NC_GREEN}●${NC_RESET} index.html ${NC_GREEN}OK${NC_RESET}       ${size} bytes"
+    else
+        echo -e "  ${NC_RED}●${NC_RESET} index.html ${NC_RED}MISSING${NC_RESET}"
+    fi
+    echo -e "  ${NC_CYAN}●${NC_RESET} Node       ${NC_CYAN}YULEFORGE${NC_RESET} · Termux Deploy"
+    echo -e "  ${NC_CYAN}●${NC_RESET} Brand      ${NC_CYAN}cfS™${NC_RESET} CreativeFactory.studio"
+    echo
+    if [ -f "$PID_FILE" ]; then
+        local pid=$(cat "$PID_FILE")
+        local elapsed=$(ps -o etime= -p "$pid" 2>/dev/null | tr -d ' ')
+        [ -n "$elapsed" ] && echo -e "  ${NC_DIM}Uptime: $elapsed${NC_RESET}"
+    fi
+    if [ -f "$LOG_FILE" ]; then
+        echo
+        echo -e "${NC_DIM}── Recent Log ──${NC_RESET}"
+        tail -5 "$LOG_FILE" | while read line; do
+            echo -e "  ${NC_DIM}$line${NC_RESET}"
+        done
+    fi
+}
+
+open_browser() {
+    if command -v termux-open >/dev/null 2>&1; then
+        termux-open "http://localhost:$PORT" 2>/dev/null
+        log OK "Opened browser · localhost:$PORT"
+    else
+        log WARN "termux-open not available"
+        echo -e "  ${NC_CYAN}→ Open manually: http://localhost:$PORT${NC_RESET}"
+    fi
+}
+
+case "${1:-launch}" in
+    start)  show_banner; start_server ;;
+    stop)   show_banner; stop_server ;;
+    status) show_banner; show_status ;;
+    restart) show_banner; stop_server; sleep 1; start_server ;;
+    launch|*)
+        show_banner
+        start_server
+        if [ $? -eq 0 ]; then
+            sleep 0.5
+            open_browser
+        fi
+        show_status
+        ;;
+esac

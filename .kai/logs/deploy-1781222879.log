@@ -1,1 +1,3 @@
 [0;36m[KAI][0m Initializing scaffold...
+[0;32m[OK][0m  Scaffold ready.
+[1;33m[WRN][0m Next: create GitHub repo, set remote, then 'kai deploy'
