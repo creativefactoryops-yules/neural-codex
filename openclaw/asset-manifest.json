@@ -1,0 +1,11 @@
+{
+  "files": {
+    "main.js": "/static/js/main.b20b356d.js",
+    "vendors.js": "/static/js/vendors.954ce640.js",
+    "index.html": "/index.html"
+  },
+  "entrypoints": [
+    "static/js/vendors.954ce640.js",
+    "static/js/main.b20b356d.js"
+  ]
+}
