@@ -1,8 +1,141 @@
-cd ~/neural-codex
-git init
-git add index.html
-git commit -m "init"
-git remote add origin https://github.com/YOUR_USERNAME/neural-codex.git
-git branch -M main
-git push -u origin main
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural-Codex | Instagram Growth Suite</title>
+<style>
+*{box-sizing:border-box;margin:0;font-family:system-ui,-apple-system,sans-serif}
+body{background:#0a0a0a;color:#e0e0e0;min-height:100vh;padding:20px}
+.wrap{max-width:600px;margin:0 auto}
+h1{color:#00ff88;font-size:24px;text-align:center;margin-bottom:4px}
+.sub{color:#666;text-align:center;font-size:13px;margin-bottom:8px}
+.nav{display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+.nav-btn{background:#1a1a1a;border:1px solid #222;color:#888;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:12px;transition:0.2s}
+.nav-btn.active{background:#00ff88;color:#000;border-color:#00ff88;font-weight:bold}
+.card{background:#111;border:1px solid #222;border-radius:16px;padding:24px;margin-bottom:16px;display:none}
+.card.active{display:block}
+.dropzone{display:block;border:2px dashed #333;border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:0.3s}
+.dropzone:hover,.dropzone.active{border-color:#00ff88}
+input[type="file"]{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.btn{background:#00ff88;color:#000;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:15px;width:100%;margin-top:16px}
+.btn:hover{opacity:0.9}
+.btn:disabled{background:#222;color:#666;cursor:not-allowed}
+.btn.secondary{background:#222;color:#fff}
+.grid-options{display:flex;gap:12px;justify-content:center;margin:20px 0}
+.option{background:#1a1a1a;border:2px solid #222;padding:12px 20px;border-radius:8px;cursor:pointer;font-size:14px;transition:0.2s}
+.option.active{border-color:#00ff88;color:#00ff88}
+#preview{max-width:100%;border-radius:8px;margin-top:16px;display:none}
+.output-grid{display:grid;gap:4px;margin-top:20px}
+.output-grid img{width:100%;border-radius:4px;cursor:pointer}
+.watermark{text-align:center;color:#444;font-size:11px;margin-top:8px}
+.watermark a{color:#00ff88;text-decoration:none}
+.bio-link{text-align:center;margin-top:24px;padding:16px;background:#0a0a0a;border-radius:12px}
+.bio-link a{color:#00ff88;font-size:14px;text-decoration:none}
+.bio-link p{color:#666;font-size:12px;margin-top:4px}
+textarea{width:100%;min-height:100px;background:#0a0a0a;border:1px solid #222;color:#e0e0e0;padding:12px;font-size:14px;border-radius:8px;resize:vertical;margin-top:12px}
+input[type="text"]{width:100%;background:#0a0a0a;border:1px solid #222;color:#e0e0e0;padding:12px;font-size:14px;border-radius:8px;margin-top:8px}
+.tag-pill{display:inline-block;background:#1a1a1a;border:1px solid #222;padding:6px 12px;border-radius:16px;font-size:12px;margin:4px;cursor:pointer;transition:0.2s}
+.tag-pill:hover{border-color:#00ff88;color:#00ff88}
+.tag-pill.copied{background:#00ff88;color:#000;border-color:#00ff88}
+.result-box{background:#0a0a0a;border:1px solid #222;border-radius:8px;padding:16px;margin-top:16px;font-size:14px;line-height:1.6}
+.result-box p{margin-bottom:8px}
+.copy-row{display:flex;gap:8px;margin-top:12px}
+.copy-row .btn{flex:1;margin-top:0;font-size:13px;padding:10px}
+.link-card{background:#1a1a1a;border:1px solid #222;border-radius:12px;padding:16px;margin-bottom:12px}
+.link-card input{width:100%;background:#0a0a0a;border:1px solid #222;color:#e0e0e0;padding:10px;border-radius:6px;font-size:13px;margin-top:6px}
+.link-preview{background:#0a0a0a;border-radius:8px;padding:16px;margin-top:16px;text-align:center}
+.link-preview a{color:#00ff88;font-size:18px;text-decoration:none;word-break:break-all}
+#status{position:fixed;bottom:20px;right:20px;background:#111;border:1px solid #00ff88;padding:12px 18px;border-radius:8px;font-size:13px;transform:translateY(100px);transition:0.3s;z-index:100}
+#status.show{transform:translateY(0)}
+</style>
+</head>
+<body><canvas id="mascotCanvas" width="130" height="160" style="position:fixed;bottom:20px;left:20px;z-index:100;background:#0a0a0a;border:1px solid #222;border-radius:12px;box-shadow:0 0 20px rgba(0,255,136,0.1)"></canvas><script src="mascot.js"></script><script>startMascot();</script>
+<h1>◆ NEURAL-CODEX</h1>
+<p class="sub">Instagram Growth Suite — Free Tools</p>
+<div class="nav">
+<button class="nav-btn active" onclick="showTab('grid')">Grid Splitter</button>
+<button class="nav-btn" onclick="showTab('caption')">Caption Gen</button>
+<button class="nav-btn" onclick="showTab('hashtag')">Hashtags</button>
+<button class="nav-btn" onclick="showTab('bio')">Bio Link</button>
+</div>
+<div class="card active" id="grid">
+<label class="dropzone" id="dropzone" for="fileInput">
+<p style="font-size:40px;margin-bottom:8px">📤</p>
+<p>Tap to upload an image</p>
+<p style="color:#666;font-size:12px;margin-top:8px">Or drag and drop</p>
+</label>
+<input type="file" id="fileInput" accept="image/*">
+<div class="grid-options" id="gridOptions" style="display:none">
+<div class="option active" data-grid="1x3" onclick="setGrid(this)">3 Posts</div>
+<div class="option" data-grid="2x3" onclick="setGrid(this)">6 Posts</div>
+<div class="option" data-grid="3x3" onclick="setGrid(this)">9 Posts</div>
+</div>
+<img id="preview" alt="Preview">
+<button class="btn" id="splitBtn" onclick="splitImage()" disabled>Split Grid</button>
+<div id="output" class="output-grid" style="display:none"></div>
+<p class="watermark" id="watermark" style="display:none">Made with <a href="https://instagram.com/creativefactory.studio" target="_blank">@creativefactory.studio</a></p>
+</div>
+<div class="card" id="caption">
+<h2 style="font-size:16px;color:#888;margin-bottom:12px">📝 AI Caption Generator</h2>
+<p style="color:#666;font-size:13px">Describe your post in a few words:</p>
+<input type="text" id="captionTopic" placeholder="e.g. sunset beach photo, gym workout, coffee shop">
+<div class="grid-options">
+<div class="option active" data-tone="hype" onclick="setTone(this)">Hype</div>
+<div class="option" data-tone="chill" onclick="setTone(this)">Chill</div>
+<div class="option" data-tone="professional" onclick="setTone(this)">Pro</div>
+<div class="option" data-tone="funny" onclick="setTone(this)">Funny</div>
+</div>
+<button class="btn" onclick="generateCaption()">Generate Captions</button>
+<div id="captionResult" style="display:none"></div>
+</div>
+<div class="card" id="hashtag">
+<h2 style="font-size:16px;color:#888;margin-bottom:12px">#️⃣ Hashtag Generator</h2>
+<p style="color:#666;font-size:13px">Enter your niche or topic:</p>
+<input type="text" id="hashtagTopic" placeholder="e.g. fitness, travel, tech, art">
+<button class="btn" onclick="generateHashtags()">Generate Hashtags</button>
+<div id="hashtagResult" style="display:none"></div>
+</div>
+<div class="card" id="bio">
+<h2 style="font-size:16px;color:#888;margin-bottom:12px">🔗 Bio Link Page Builder</h2>
+<p style="color:#666;font-size:13px">Add your links:</p>
+<div id="linkList">
+<div class="link-card">
+<input type="text" class="link-title" placeholder="Title (e.g. My Instagram)">
+<input type="text" class="link-url" placeholder="URL (e.g. https://instagram.com/...)">
+</div>
+</div>
+<button class="btn secondary" onclick="addLink()" style="margin-top:8px">+ Add Another Link</button>
+<button class="btn" onclick="buildBioPage()" style="margin-top:12px">Build My Page</button>
+<div id="bioResult" style="display:none"></div>
+</div>
+<div class="bio-link">
+<a href="https://instagram.com/creativefactory.studio" target="_blank">Follow @creativefactory.studio for more tools</a>
+<p>Built by Digital Forest | Termux Deploy Node</p>
+</div>
+</div>
+<div id="status">Ready</div>
+<script>
+const dropzone=document.getElementById('dropzone'),fileInput=document.getElementById('fileInput'),preview=document.getElementById('preview'),splitBtn=document.getElementById('splitBtn'),gridOptions=document.getElementById('gridOptions'),output=document.getElementById('output'),watermark=document.getElementById('watermark');
+let currentImage=null,gridSize='1x3',tone='hype';
+dropzone.addEventListener('dragover',e=>{e.preventDefault();dropzone.classList.add('active')});
+dropzone.addEventListener('dragleave',()=>dropzone.classList.remove('active'));
+dropzone.addEventListener('drop',e=>{e.preventDefault();dropzone.classList.remove('active');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
+fileInput.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0])});
+function showTab(tab){document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById(tab).classList.add('active');event.target.classList.add('active')}
+function handleFile(file){if(!file.type.startsWith('image/')){showStatus('Please upload an image');return}const reader=new FileReader();reader.onload=e=>{currentImage=new Image();currentImage.onload=()=>{preview.src=e.target.result;preview.style.display='block';gridOptions.style.display='flex';splitBtn.disabled=false;dropzone.style.display='none';showStatus('Image loaded')};currentImage.src=e.target.result};reader.readAsDataURL(file)}
+function setGrid(el){document.querySelectorAll('#grid .option').forEach(o=>o.classList.remove('active'));el.classList.add('active');gridSize=el.dataset.grid}
+function setTone(el){document.querySelectorAll('#caption .option').forEach(o=>o.classList.remove('active'));el.classList.add('active');tone=el.dataset.tone}
+function splitImage(){if(!currentImage)return;const[rows,cols]=gridSize.split('x').map(Number),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d'),pieceW=currentImage.width/cols,pieceH=currentImage.height/rows;output.innerHTML='';output.style.gridTemplateColumns=`repeat(${cols},1fr)`;output.style.display='grid';for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){canvas.width=pieceW;canvas.height=pieceH;ctx.drawImage(currentImage,c*pieceW,r*pieceH,pieceW,pieceH,0,0,pieceW,pieceH);const img=document.createElement('img');img.src=canvas.toDataURL('image/jpeg',0.95);img.onclick=()=>downloadPiece(img.src,r,c);output.appendChild(img)}watermark.style.display='block';showStatus('Grid ready! Tap pieces to download')}
+function downloadPiece(dataUrl,row,col){const a=document.createElement('a');a.href=dataUrl;a.download=`grid-${row+1}x${col+1}.jpg`;a.click();showStatus('Downloaded!')}
+const captions={hype:[{t:"🔥 This is the energy we're bringing ALL YEAR. No cap. Let's GOOOO 👇",h:"#hype #motivation #energy #grind #letsgo"},{t:"💯 Level UP season is HERE. You either riding with us or watching from the sidelines 👀",h:"#levelup #grindmode #success #winning"},{t:"⚡️ Manifesting everything I said I wanted. Watch me work. 🎯",h:"#manifest #goals #hustle #dreambig"}],chill:[{t:"🌿 Slow down. Breathe. The best moments aren't rushed. ✨",h:"#chillvibes #mindful #slowliving #peace"},{t:"☕️ Coffee, good music, zero stress. That's the plan today. 🤙",h:"#chill #coffee #goodvibes #relax"},{t:"🌙 Not every day needs to be productive. Some days just need to be yours. 💆",h:"#selfcare #chillmode #rest #balance"}],professional:[{t:"📊 Consistency compounds. Small wins today, massive results tomorrow. 🎯",h:"#business #growth #strategy #professional"},{t:"🤝 Building something that outlasts the hype. Long-term vision, short-term action. 📈",h:"#entrepreneur #vision #leadership #success"},{t:"💼 The difference between good and great? Attention to detail. Always. 🔍",h:"#excellence #professional #quality #business"}],funny:[{t:"😂 Me pretending I have my life together for the gram. Oscar-worthy performance tbh 🎭",h:"#relatable #funny #meme #mood"},{t:"🍕 My diet plan: if it fits in my mouth, it fits in my diet. Nutritionists hate this one trick 😤",h:"#foodie #funny #relatable #food"},{t:"📱 Posted this while procrastinating on 3 other things. We contain multitudes ✨",h:"#procrastination #relatable #funny #real"}]};
+function generateCaption(){const topic=document.getElementById('captionTopic').value.trim();if(!topic){showStatus('Enter a topic first');return}const list=captions[tone]||captions.hype;const result=document.getElementById('captionResult');result.innerHTML='<h3 style="color:#888;font-size:14px;margin-bottom:12px">Generated Captions:</h3>';list.forEach((cap,i)=>{const div=document.createElement('div');div.className='result-box';div.innerHTML=`<p><strong>${i+1}.</strong> ${cap.t}</p><p style="color:#666;font-size:12px">${cap.h}</p><div class="copy-row"><button class="btn secondary" onclick="copyText(this,'${cap.t.replace(/'/g,"\\'")}')">Copy Caption</button><button class="btn secondary" onclick="copyText(this,'${cap.h}')">Copy Hashtags</button></div>`;result.appendChild(div)});result.style.display='block';showStatus('Captions generated!')}
+const hashtagNiches={fitness:["#fitness #gym #workout #fitnessmotivation #fit #bodybuilding #training #health #lifestyle #fitfam #muscle #exercise #weightloss #gymlife #fitnessjourney #strong #cardio #nutrition #gains #fitspo"],travel:["#travel #wanderlust #adventure #travelphotography #explore #travelgram #instatravel #trip #vacation #traveling #nature #photography #landscape #backpacking #solotravel #travelblogger #hiddengems #passportready"],tech:["#tech #technology #coding #programmer #developer #software #ai #innovation #startup #gadgets #codinglife #webdev #appdev #techie #digital #future #automation #buildinpublic"],art:["#art #artist #artwork #creative #design #digitalart #illustration #painting #sketch #artistic #gallery #contemporaryart #artoftheday #instaart #visualart #artlife #createeveryday"],food:["#food #foodie #foodphotography #delicious #foodstagram #yummy #instafood #cooking #homemade #foodlover #chef #foodblogger #tasty #eat #foodpics #comfortfood #foodcoma"]};
+function generateHashtags(){const topic=document.getElementById('hashtagTopic').value.trim().toLowerCase();if(!topic){showStatus('Enter a topic first');return}let tags=hashtagNiches[topic]||hashtagNiches.tech;const result=document.getElementById('hashtagResult');result.innerHTML='<h3 style="color:#888;font-size:14px;margin-bottom:12px">Generated Hashtags:</h3><div class="result-box"><p style="color:#00ff88;font-size:13px;word-break:break-word">'+tags[0]+'</p></div><div class="copy-row"><button class="btn" onclick="copyText(this,\''+tags[0]+'\')">Copy All</button></div>';result.style.display='block';showStatus('Hashtags ready!')}
+function addLink(){const div=document.createElement('div');div.className='link-card';div.innerHTML='<input type="text" class="link-title" placeholder="Title"><input type="text" class="link-url" placeholder="URL">';document.getElementById('linkList').appendChild(div)}
+function buildBioPage(){const titles=[...document.querySelectorAll('.link-title')].map(i=>i.value.trim()).filter(v=>v);const urls=[...document.querySelectorAll('.link-url')].map(i=>i.value.trim()).filter(v=>v);if(titles.length===0||urls.length===0){showStatus('Add at least one link');return}let html='<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Links | Neural-Codex</title><style>*{box-sizing:border-box;margin:0;font-family:system-ui,sans-serif}body{background:#0a0a0a;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px}.profile{width:80px;height:80px;background:#00ff88;border-radius:50%;margin-bottom:16px;display:flex;align-items:center;justify-content:center;font-size:28px}h1{font-size:20px;margin-bottom:4px}p{color:#666;font-size:13px;margin-bottom:24px}.link{display:block;width:100%;max-width:400px;background:#111;border:1px solid #222;padding:16px;margin-bottom:12px;border-radius:12px;text-align:center;color:#e0e0e0;text-decoration:none;font-size:15px;transition:0.2s}.link:hover{border-color:#00ff88;color:#00ff88}.footer{margin-top:auto;padding-top:40px;color:#444;font-size:11px}</style></head><body><canvas id="mascotCanvas" width="130" height="160" style="position:fixed;bottom:20px;left:20px;z-index:100;background:#0a0a0a;border:1px solid #222;border-radius:12px;box-shadow:0 0 20px rgba(0,255,136,0.1)"></canvas><script src="mascot.js"></script><script>startMascot();</script><div class="profile">◆</div><h1>@creativefactory.studio</h1><p>--force ./buildyou</p>';for(let i=0;i<Math.min(titles.length,urls.length);i++){html+=`<a class="link" href="${urls[i]}" target="_blank">${titles[i]}</a>`}html+='<div class="footer">Made with Neural-Codex</div></body></html>';const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);const result=document.getElementById('bioResult');result.innerHTML='<div class="link-preview"><p style="color:#888;margin-bottom:12px">Your bio page is ready!</p><a href="'+url+'" target="_blank">Open Bio Page</a><p style="color:#666;font-size:12px;margin-top:12px">Save this HTML file and upload anywhere</p></div>';result.style.display='block';showStatus('Bio page built!')}
+function copyText(btn,text){navigator.clipboard.writeText(text);btn.textContent='Copied!';btn.style.background='#00ff88';btn.style.color='#000';setTimeout(()=>{btn.textContent=btn.textContent.includes('Hashtags')?'Copy Hashtags':'Copy Caption';btn.style.background='';btn.style.color=''},2000);showStatus('Copied to clipboard!')}
+function showStatus(msg){const s=document.getElementById('status');s.textContent=msg;s.classList.add('show');setTimeout(()=>s.classList.remove('show'),2500)}
+</script>
+</body>
+</html>
